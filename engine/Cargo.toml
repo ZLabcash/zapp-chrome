@@ -1,0 +1,70 @@
+[package]
+name = "zapp-engine"
+version = "0.1.0"
+edition = "2021"
+description = "ZApp for Chrome: the wallet engine (librustzcash, as in the ZApp iOS SDK) compiled to WebAssembly"
+license = "MIT OR Apache-2.0"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# The same librustzcash releases as ZcashLightClientKit 3.0 (ZApp on iOS).
+zcash_client_sqlite = { version = "0.22", default-features = false, features = ["orchard", "transparent-inputs", "serde"] }
+zcash_client_backend = { version = "0.24", default-features = false, features = ["orchard", "pczt", "transparent-inputs"] }
+zcash_primitives = { version = "0.30", default-features = false }
+zcash_protocol = "0.10"
+zcash_keys = { version = "0.16", features = ["orchard", "transparent-inputs"] }
+zcash_address = "0.13"
+zcash_proofs = { version = "0.30", default-features = false }
+zip321 = "0.9"
+pczt = { version = "0.9.3", default-features = false, features = ["orchard", "sapling", "transparent", "prover", "signer", "io-finalizer", "tx-extractor"] }
+orchard = { version = "0.15", default-features = false, features = ["circuit"] }
+sapling = { package = "sapling-crypto", version = "0.7", default-features = false }
+zip32 = "0.2"
+prost = "0.14"
+jubjub = "0.10"
+bls12_381 = "0.8"
+secrecy = "0.8"
+
+# The Flipper side: the same bridge ZApp links (sign requests, signatures, addresses, phrases).
+zflip-bridge = { path = "../../flipper-zero/bridge" }
+zflip-core = { path = "../../flipper-zero/core", features = ["english"] }
+
+# The browser: SQLite on OPFS, JS glue.
+rusqlite = { version = "0.38", features = ["fallible_uint"] }
+sqlite-wasm-vfs = "0.2"
+sqlite-wasm-rs = "0.5"
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+serde = { version = "1", features = ["derive"] }
+serde-wasm-bindgen = "0.6"
+console_error_panic_hook = "0.1"
+
+# Phrases sealed at rest: Argon2id + AES-256-GCM (as ZKindle).
+argon2 = "0.5"
+aes-gcm = "0.10"
+zeroize = "1"
+rand_core = { version = "0.6", features = ["getrandom"] }
+hex = "0.4"
+
+# Randomness and time in the browser.
+uuid = { version = "1", features = ["js"] }
+getrandom = { version = "0.2", features = ["js"] }
+getrandom03 = { package = "getrandom", version = "0.3", features = ["wasm_js"] }
+time = { version = "0.3", features = ["wasm-bindgen"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+debug = false
+panic = "abort"
+
+[patch.crates-io]
+zcash_client_sqlite = { path = "../vendor/zcash_client_sqlite" }
+zcash_client_backend = { path = "../vendor/zcash_client_backend" }
+pasta_curves = { path = "../vendor/pasta_curves" }
+orchard = { path = "../vendor/orchard" }
+schemerz-rusqlite = { path = "../vendor/schemerz-rusqlite" }

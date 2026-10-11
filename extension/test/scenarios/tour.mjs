@@ -1,0 +1,30 @@
+// After create.mjs's wallet exists in the profile: Home, Send, wallets, settings, dark.
+export default async ({ page, shot, click, wait }) => {
+  await wait(1500);
+  await shot("20-home");
+  await page.evaluate(() => [...document.querySelectorAll("button")].find((b) => b.textContent.includes("My wallet"))?.click());
+  await wait(700);
+  await shot("21-wallets");
+  await click("Add a wallet");
+  await shot("22-add");
+  await click("Connect a device");
+  await shot("23-connect");
+  await page.evaluate(() => document.querySelectorAll(".back-arrow")[document.querySelectorAll(".back-arrow").length - 1].click());
+  await wait(500);
+  await page.evaluate(() => document.querySelectorAll(".back-arrow")[document.querySelectorAll(".back-arrow").length - 1].click());
+  await wait(500);
+  await page.evaluate(() => document.querySelector("button[aria-label=Settings]").click());
+  await wait(700);
+  const scroller = await page.evaluateHandle(() => [...document.querySelectorAll(".scroll")].pop());
+  await page.evaluate((el) => el.scrollTo(0, 400), scroller);
+  await wait(300);
+  await shot("24-settings-mid");
+  await page.evaluate((el) => el.scrollTo(0, 2000), scroller);
+  await wait(300);
+  await shot("25-settings-end");
+  await click("Dark");
+  await wait(400);
+  await click("Currency");
+  await wait(1500);
+  await shot("26-currency-dark");
+};

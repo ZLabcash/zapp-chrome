@@ -1,0 +1,575 @@
+/* ZApp's Theme: the Zcash yellow, black in dark mode / white in light, cards a step off it. */
+
+:root {
+  --zcash: #f4b728;
+  --scan: #1baf7a;
+  --orange: #ff9500;
+  --red: #ff3b30;
+  --bg: #ffffff;
+  --card: #f3f3f3;
+  --ink: #212629;
+  --text: #000000;
+  --muted: rgba(60, 60, 67, 0.6);
+  --line: rgba(60, 60, 67, 0.18);
+  --soft: rgba(0, 0, 0, 0.06);
+  --shadow: 0 10px 40px rgba(0, 0, 0, 0.18);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000000;
+    --card: #1c1c1c;
+    --ink: #ffffff;
+    --text: #ffffff;
+    --muted: rgba(235, 235, 245, 0.6);
+    --line: rgba(84, 84, 88, 0.6);
+    --soft: rgba(255, 255, 255, 0.08);
+    --shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #000000;
+  --card: #1c1c1c;
+  --ink: #ffffff;
+  --text: #ffffff;
+  --muted: rgba(235, 235, 245, 0.6);
+  --line: rgba(84, 84, 88, 0.6);
+  --soft: rgba(255, 255, 255, 0.08);
+  --shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The popup: a phone-sized window. */
+body.popup {
+  width: 380px;
+  height: 600px;
+  overflow: hidden;
+}
+
+/* The app page: the same screen, centred, phone-sized. */
+body.app {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+body.app #root {
+  width: 420px;
+  max-width: 100%;
+  height: 100vh;
+  max-height: 860px;
+}
+@media (min-height: 700px) {
+  body.app {
+    align-items: center;
+  }
+  body.app #root {
+    height: min(860px, calc(100vh - 48px));
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+}
+
+#root {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+}
+
+input,
+textarea {
+  font: inherit;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  min-width: 0;
+  resize: none;
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ---- screens ---- */
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  animation: push 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.screen.back {
+  animation: none;
+}
+@keyframes push {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+[dir="rtl"] .screen {
+  animation-name: push-rtl;
+}
+@keyframes push-rtl {
+  from {
+    transform: translateX(-24px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.nav {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  padding: 10px 14px 6px;
+  min-height: 52px;
+  flex-shrink: 0;
+}
+.nav h1 {
+  margin: 0;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+}
+.back-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--card);
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+}
+[dir="rtl"] .back-arrow svg {
+  transform: scaleX(-1);
+}
+
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+.pad {
+  padding: 16px 18px 24px;
+}
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+.gap-6 { gap: 6px; }
+.gap-8 { gap: 8px; }
+.gap-10 { gap: 10px; }
+.gap-12 { gap: 12px; }
+.gap-14 { gap: 14px; }
+.gap-16 { gap: 16px; }
+.gap-18 { gap: 18px; }
+.gap-22 { gap: 22px; }
+.row {
+  display: flex;
+  align-items: center;
+}
+.spacer {
+  flex: 1;
+}
+.center {
+  text-align: center;
+  align-items: center;
+}
+
+/* ---- type ---- */
+
+.title2 {
+  font-size: 22px;
+  font-weight: 700;
+}
+.headline {
+  font-size: 16px;
+  font-weight: 600;
+}
+.sub {
+  font-size: 14px;
+}
+.sub.b {
+  font-weight: 600;
+}
+.foot {
+  font-size: 13px;
+}
+.cap {
+  font-size: 12px;
+}
+.cap2 {
+  font-size: 11px;
+}
+.muted {
+  color: var(--muted);
+}
+.ink {
+  color: var(--ink);
+}
+.yellow {
+  color: var(--zcash);
+}
+.orange {
+  color: var(--orange);
+}
+.red {
+  color: var(--red);
+}
+.green {
+  color: var(--scan);
+}
+.mono {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+.num {
+  font-variant-numeric: tabular-nums;
+}
+.rounded {
+  font-family: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif;
+}
+.upper {
+  text-transform: uppercase;
+}
+.break {
+  word-break: break-all;
+}
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- surfaces ---- */
+
+.card {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 18px;
+}
+.card.big {
+  border-radius: 24px;
+  padding: 20px;
+}
+.field {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 13px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.card .field {
+  background: var(--bg);
+}
+.divider {
+  height: 1px;
+  background: var(--line);
+  margin: 0;
+  border: none;
+}
+
+/* ---- buttons ---- */
+
+.primary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 15px 16px;
+  border-radius: 14px;
+  background: var(--zcash);
+  color: #000;
+  font-size: 16px;
+  font-weight: 600;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.primary:active:not(:disabled) {
+  transform: scale(0.985);
+}
+.primary:disabled {
+  opacity: 0.5;
+}
+.danger {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 15px 16px;
+  border-radius: 14px;
+  background: rgba(255, 59, 48, 0.12);
+  color: var(--red);
+  font-size: 16px;
+  font-weight: 600;
+}
+.plain-btn {
+  color: var(--zcash);
+  font-weight: 600;
+  font-size: 14px;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: var(--card);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.chip-soon {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(244, 183, 40, 0.2);
+  color: var(--zcash);
+}
+.badge-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: #000;
+  background: var(--orange);
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  min-height: 72px;
+  background: var(--card);
+  border-radius: 18px;
+  width: 100%;
+  text-align: start;
+}
+.option-card.soon {
+  opacity: 0.55;
+}
+.icon-tile {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--zcash);
+  color: #000;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+/* ---- sheets, popovers, dialogs ---- */
+
+.sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  animation: fade 0.2s ease;
+}
+.sheet {
+  width: 100%;
+  max-height: 94%;
+  background: var(--bg);
+  border-radius: 22px 22px 0 0;
+  display: flex;
+  flex-direction: column;
+  animation: rise 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow: hidden;
+}
+.sheet.full {
+  height: 94%;
+}
+.grabber {
+  width: 40px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--muted);
+  opacity: 0.5;
+  margin: 8px auto 2px;
+  flex-shrink: 0;
+}
+@keyframes rise {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  animation: fade 0.15s ease;
+}
+.dialog {
+  width: 100%;
+  background: var(--bg);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  animation: rise 0.2s ease;
+}
+
+.popover {
+  position: absolute;
+  z-index: 40;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+  animation: fade 0.15s ease;
+}
+
+.menu {
+  position: absolute;
+  z-index: 40;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 6px;
+  min-width: 200px;
+  max-height: 380px;
+  overflow-y: auto;
+  animation: fade 0.12s ease;
+}
+.menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: 9px;
+  font-size: 14px;
+  text-align: start;
+}
+.menu button:hover {
+  background: var(--soft);
+}
+
+/* ---- toggle ---- */
+
+.toggle {
+  width: 51px;
+  height: 31px;
+  border-radius: 999px;
+  background: var(--soft);
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.toggle::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  inset-inline-start: 2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  transition: inset-inline-start 0.2s;
+}
+.toggle.on {
+  background: var(--zcash);
+}
+.toggle.on::after {
+  inset-inline-start: 22px;
+}
+
+/* ---- motion ---- */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin {
+  animation: spin 1.4s linear infinite;
+  transform-origin: 50% 50%;
+}
+@keyframes pulse {
+  50% {
+    transform: scale(1.5);
+  }
+}
+.fade-in {
+  animation: fade 0.6s ease both;
+}
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.appear {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
