@@ -17,6 +17,7 @@ export default defineConfig(({ mode }) => ({
       input: {
         popup: resolve(__dirname, "popup.html"),
         app: resolve(__dirname, "app.html"),
+        sidepanel: resolve(__dirname, "sidepanel.html"),
         offscreen: resolve(__dirname, "offscreen.html"),
         background: resolve(__dirname, "src/background/main.ts"),
       },

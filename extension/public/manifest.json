@@ -3,7 +3,7 @@
   "name": "ZApp",
   "short_name": "ZApp",
   "version": "0.1.0",
-  "description": "A private Zcash wallet. Create a wallet or connect a cold wallet like ZFlip. Shielded by default.",
+  "description": "A private open source Zcash wallet",
   "action": {
     "default_popup": "popup.html",
     "default_title": "ZApp",
@@ -29,7 +29,7 @@
     "unlimitedStorage",
     "offscreen",
     "alarms",
-    "idle"
+    "sidePanel"
   ],
   "host_permissions": [
     "https://zec.rocks/*",
@@ -44,5 +44,8 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
   },
-  "minimum_chrome_version": "116"
+  "minimum_chrome_version": "116",
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  }
 }

@@ -28,8 +28,8 @@ bls12_381 = "0.8"
 secrecy = "0.8"
 
 # The Flipper side: the same bridge ZApp links (sign requests, signatures, addresses, phrases).
-zflip-bridge = { path = "../../flipper-zero/bridge" }
-zflip-core = { path = "../../flipper-zero/core", features = ["english"] }
+zflip-bridge = { path = "../../zfirm/bridge" }
+zflip-core = { path = "../../zfirm/core", features = ["english"] }
 
 # The browser: SQLite on OPFS, JS glue.
 rusqlite = { version = "0.38", features = ["fallible_uint"] }

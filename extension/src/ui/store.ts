@@ -6,7 +6,6 @@ import type { ComponentChild } from "preact";
 import { pack, unpack } from "../port";
 import type { State } from "../model/types";
 import { DEFAULT_SETTINGS } from "../model/types";
-import { FlipperLink } from "../flipper/link";
 import { effective, setLanguage } from "../i18n";
 
 const empty: State = {
@@ -24,6 +23,9 @@ const empty: State = {
   settings: DEFAULT_SETTINGS,
   prices: {},
   vault: { exists: false, passkey: false },
+  locked: false,
+  flipper: { connected: false, walletId: null, name: null, awaiting: false, busy: false, error: null },
+  flipperHost: false,
   send: { step: "idle" },
   online: true,
 };
@@ -94,9 +96,12 @@ export function getState() {
 
 export function useStore(): State {
   const [, set] = useState(0);
+  const seen = state;
   useEffect(() => {
     const l = () => set((n) => n + 1);
     listeners.add(l);
+    // A state that came between this render and now (the first one often does) was missed.
+    if (state !== seen) l();
     return () => void listeners.delete(l);
   }, []);
   return state;
@@ -159,31 +164,25 @@ export function useNav() {
   return { stack, sheets, popped };
 }
 
-// ---- this page's Flipper ----
+// ---- where this page runs ----
 
-export const link = new FlipperLink();
-const linkListeners = new Set<() => void>();
-link.onChange = () => linkListeners.forEach((l) => l());
-link.onAddress = (index, address) => void call("flipperShows", index, address);
+/** The toolbar popup, the side panel (which keeps the Flipper connected), or the full page. */
+export const context: "popup" | "panel" | "app" = document.body.classList.contains("popup") ? "popup" : document.body.classList.contains("panel") ? "panel" : "app";
+export const isPopup = context === "popup";
 
-export function useLink() {
-  const [, set] = useState(0);
-  useEffect(() => {
-    const l = () => set((n) => n + 1);
-    linkListeners.add(l);
-    return () => void linkListeners.delete(l);
-  }, []);
-  return link;
-}
-
-/** Which wallet the connected Flipper's session belongs to (HELLO accepted). */
-export const flipperSession: { walletId: string | null } = { walletId: null };
-
-/** Whether this page runs as the toolbar popup (Bluetooth choosers close it: use the app tab). */
-export const isPopup = document.body.classList.contains("popup");
-
-/** Opens the full-page app (for Bluetooth pairing, the camera, or more room). */
+/** Opens the full-page app (onboarding, restoring, more room). */
 export function openApp(hash = "") {
   chrome.tabs.create({ url: chrome.runtime.getURL("app.html") + hash });
+  if (isPopup) window.close();
+}
+
+// Known ahead: the side panel only opens straight from the click, with nothing awaited before.
+let windowId: number | undefined;
+if (context !== "panel") chrome.windows.getCurrent().then((w) => (windowId = w.id));
+
+/** Opens ZApp in Chrome's side panel (it keeps the Flipper connected while you browse). */
+export async function openSidePanel() {
+  const opening = windowId !== undefined ? chrome.sidePanel.open({ windowId }) : chrome.windows.getCurrent().then((w) => chrome.sidePanel.open({ windowId: w.id! }));
+  await opening;
   if (isPopup) window.close();
 }

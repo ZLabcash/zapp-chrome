@@ -19,7 +19,20 @@ import {
   type Wallet,
 } from "./types";
 import { toB64, fromB64, hexReverse, uuid } from "./util";
+import { pack, unpack } from "../port";
 import { PriceService } from "./prices";
+
+export type FlipperLinkState = {
+  connected: boolean;
+  /** The wallet whose Flipper has a session open (HELLO accepted). */
+  walletId: string | null;
+  name: string | null;
+  /** The Flipper shows a prompt and waits for its user. */
+  awaiting: boolean;
+  /** Connecting or opening a session. */
+  busy: boolean;
+  error: string | null;
+};
 
 /** 2026-10-01: no ZFlip wallet is older (a Flipper whose clock was never set stamps years back). */
 const ZFLIP_EPOCH = 1_790_812_800;
@@ -48,6 +61,14 @@ export class WalletModel {
   private proving = new Map<string, { pczt: Uint8Array; proofs: Promise<Uint8Array>; payments: Payment[]; fee: number; walletId: string }>();
   readonly prices = new PriceService();
   private online = navigator.onLine;
+  /** The vault key while unlocked (as MetaMask: the password once per session). */
+  private session: Uint8Array | null = null;
+  private lockTimer: ReturnType<typeof setTimeout> | null = null;
+  /** The page holding the Flipper's Bluetooth link (the side panel or the app tab). */
+  private host: chrome.runtime.Port | null = null;
+  private hostCalls = new Map<number, { resolve: (v: any) => void; reject: (e: Error) => void }>();
+  private hostNext = 1;
+  flipper: FlipperLinkState = { connected: false, walletId: null, name: null, awaiting: false, busy: false, error: null };
   private opened = false;
   onChange: () => void = () => {};
 
@@ -129,6 +150,9 @@ export class WalletModel {
       settings: this.stored.settings,
       prices: this.prices.prices,
       vault: { exists: !!this.stored.vault, passkey: !!this.stored.vault?.passkey },
+      locked: !!this.stored.vault && !this.session,
+      flipper: this.flipper,
+      flipperHost: !!this.host,
       send: this.send,
       online: this.online,
     };
@@ -205,13 +229,51 @@ export class WalletModel {
       await this.refresh();
       return known;
     }
-    const accountUuid = await this.engine.call<string>("importAccount", w.name, w.ufvk, w.birthday, new Uint8Array(w.seedFingerprint), w.account, w.kind === "phone" ? "zapp" : "zflip");
+    // Reuse an engine account that already holds this key (a past attempt that half-finished, or
+    // the same account known under another wallet), so a second add never hits "already exists".
+    const accounts: { uuid: string; ufvk: string }[] = await this.engine.call("accounts");
+    const had = accounts.find((a) => a.ufvk === w.ufvk);
+    const accountUuid = had ? had.uuid : await this.engine.call<string>("importAccount", w.name, w.ufvk, w.birthday, new Uint8Array(w.seedFingerprint), w.account, w.kind === "phone" ? "zapp" : "zflip");
     const wallet = { ...w, accountUuid };
     this.stored.wallets.push(wallet);
     this.stored.activeId = wallet.id;
     await this.save();
     await this.refresh();
     return wallet;
+  }
+
+  /** Derives the next ZIP-32 account of a browser wallet's seed as a new wallet (MetaMask-style:
+      the same 24 words, account index + 1). The session must be unlocked. */
+  async addAccount(walletId: string, name: string): Promise<string> {
+    const parent = this.stored.wallets.find((x) => x.id === walletId);
+    if (!parent || parent.kind !== "phone") throw new Error("ON_DEVICE");
+    const key = this.sessionKey();
+    const plain: Uint8Array = await this.engine.call("open_", key.slice(), fromB64(this.stored.vault!.phrases[walletId]));
+    const phrase = new TextDecoder().decode(plain);
+    plain.fill(0);
+    // The next free account index across every wallet sharing this seed.
+    const fp = JSON.stringify(parent.seedFingerprint);
+    const kin = this.stored.wallets.filter((w) => w.kind === "phone" && JSON.stringify(w.seedFingerprint) === fp);
+    const nextAccount = Math.max(...kin.map((w) => w.account)) + 1;
+    const { ufvk } = await this.engine.call<{ fingerprint: Uint8Array; ufvk: string }>("ufvkForAccount", phrase, nextAccount);
+    if (this.stored.wallets.some((w) => w.ufvk === ufvk)) {
+      key.fill(0);
+      throw new Error("ALREADY_HERE");
+    }
+    const id = uuid();
+    const sealed: Uint8Array = await this.engine.call("seal", key, new TextEncoder().encode(phrase));
+    key.fill(0);
+    this.stored.vault!.phrases[id] = toB64(sealed);
+    const label = name.trim() || `Account ${nextAccount + 1}`;
+    try {
+      await this.add({ id, kind: "phone", name: label, deviceName: label, network: parent.network, ufvk, seedFingerprint: [...parent.seedFingerprint], account: nextAccount, birthday: parent.birthday, addressIndex: 0 });
+    } catch (e) {
+      delete this.stored.vault!.phrases[id];
+      await this.save();
+      throw e;
+    }
+    this.engine.call("sync");
+    return id;
   }
 
   async activate(id: string) {
@@ -331,21 +393,75 @@ export class WalletModel {
   async checkPassword(password: string): Promise<boolean> {
     if (!this.stored.vault) return true;
     try {
-      await this.vaultKey(password);
+      (await this.vaultKey(password)).fill(0);
       return true;
     } catch {
       return false;
     }
   }
 
+  /** Unlocks the browser wallets for this session (until locked, or idle for the set time). */
+  async unlock(password: string) {
+    const key = await this.vaultKey(password);
+    this.session?.fill(0);
+    this.session = key;
+    await this.save();
+    this.touch();
+    this.onChange();
+  }
+
+  lock() {
+    this.session?.fill(0);
+    this.session = null;
+    if (this.lockTimer) clearTimeout(this.lockTimer);
+    this.lockTimer = null;
+    this.onChange();
+  }
+
+  /** Any use of the wallet: the auto-lock starts over. */
+  touch() {
+    if (!this.session) return;
+    if (this.lockTimer) clearTimeout(this.lockTimer);
+    const minutes = this.stored.settings.lockMinutes;
+    if (minutes > 0) this.lockTimer = setTimeout(() => this.lock(), minutes * 60_000);
+  }
+
+  /** A copy of the session key (the engine wipes what it is given). */
+  private sessionKey(): Uint8Array {
+    if (!this.session) throw new Error("LOCKED");
+    return this.session.slice();
+  }
+
+  /** Changes the password: the phrases are sealed again under the new key. */
+  async changePassword(current: string, next: string) {
+    const old = await this.vaultKey(current);
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const key: Uint8Array = await this.engine.call("kdf", next, salt);
+    const phrases: Record<string, string> = {};
+    for (const [id, sealed] of Object.entries(this.stored.vault!.phrases)) {
+      const plain: Uint8Array = await this.engine.call("open_", old.slice(), fromB64(sealed));
+      phrases[id] = toB64(await this.engine.call("seal", key.slice(), plain));
+      plain.fill(0);
+    }
+    const check: Uint8Array = await this.engine.call("seal", key.slice(), new TextEncoder().encode("zapp"));
+    this.stored.vault = { salt: toB64(salt), check: toB64(check), phrases };
+    old.fill(0);
+    this.session?.fill(0);
+    this.session = key;
+    await this.save();
+    this.onChange();
+  }
+
   /** Creates (`since` null: from today) or restores a browser wallet; the phrase is sealed by `password`. */
-  async addPhoneWallet(name: string, phrase: string, since: number | null, password: string) {
+  async addPhoneWallet(name: string, phrase: string, since: number | null, password: string | null) {
     const clean = phrase.toLowerCase().split(/\s+/).filter(Boolean).join(" ");
     const { fingerprint, ufvk } = await this.engine.call<{ fingerprint: Uint8Array; ufvk: string }>("mnemonicCheck", clean).catch(() => {
       throw new Error("BAD_PHRASE");
     });
     if (this.stored.wallets.some((w) => w.ufvk === ufvk)) throw new Error("ALREADY_HERE");
-    const key = await this.vaultKey(password);
+    // The first browser wallet sets the password (and unlocks); later ones use the session.
+    if (password !== null) await this.unlock(password);
+    const key = this.sessionKey();
     const birthday =
       since === null
         ? Math.max(this.sync.tip || (await this.engine.call<number>("latestHeight")), NU5_HEIGHT[0])
@@ -383,8 +499,16 @@ export class WalletModel {
     this.onChange();
   }
 
-  address(ufvk: string, index: number): Promise<string> {
-    return this.engine.call("address", ufvk, index);
+  // Derived addresses never change for a given key and index: once derived, served from memory so
+  // Home and Receive never wait behind a scan to show one again.
+  private addressCache = new Map<string, string>();
+  async address(ufvk: string, index: number): Promise<string> {
+    const key = `${ufvk}:${index}`;
+    const hit = this.addressCache.get(key);
+    if (hit) return hit;
+    const value: string = await this.engine.call("address", ufvk, index);
+    this.addressCache.set(key, value);
+    return value;
   }
 
   /** Every address each wallet has shown, to name payments between your own wallets. */
@@ -471,13 +595,13 @@ export class WalletModel {
     return m;
   }
 
-  /** A browser wallet's payment: the password opens its phrase for this one signature. */
-  async sendFromBrowser(payments: Payment[], password: string) {
+  /** A browser wallet's payment: the session key opens its phrase for this one signature. */
+  async sendFromBrowser(payments: Payment[]) {
     const w = this.active;
     if (!w || w.kind !== "phone") return;
     this.setSend({ step: "preparing" });
     try {
-      const key = await this.vaultKey(password);
+      const key = this.sessionKey();
       const p = await this.engine.call("propose", w.accountUuid, WalletModel.paymentUri(payments));
       const params = p.needsSapling ? await this.saplingParams() : [undefined, undefined];
       const txids: string[] = await this.engine.call("createTransactions", p.proposal, fromB64(this.stored.vault!.phrases[w.id]), key, w.account, p.needsSapling, ...params);
@@ -488,11 +612,74 @@ export class WalletModel {
       await this.refresh();
     } catch (e) {
       const m = e instanceof Error ? e.message : String(e);
-      if (m === "WRONG_PASSWORD") {
-        this.setSend({ step: "idle" });
-        throw e;
+      this.setSend({ step: "failed", message: m === "LOCKED" ? "LOCKED" : this.explain(e, payments) });
+    }
+  }
+
+  // ---- the Flipper, through the page that holds its Bluetooth link ----
+
+  /** The side panel (or the app tab) takes the link: Web Bluetooth only lives in a visible page. */
+  attachHost(port: chrome.runtime.Port) {
+    this.host?.disconnect();
+    this.host = port;
+    port.onMessage.addListener((m) => {
+      if (m.event === "flipper") {
+        this.flipper = m.state;
+        this.onChange();
+        if (m.address) this.flipperShows(m.address.index, m.address.text);
+        return;
       }
-      this.setSend({ step: "failed", message: this.explain(e, payments) });
+      const c = this.hostCalls.get(m.id);
+      if (!c) return;
+      this.hostCalls.delete(m.id);
+      m.ok ? c.resolve(m.value) : c.reject(new Error(m.error));
+    });
+    port.onDisconnect.addListener(() => {
+      if (this.host !== port) return;
+      this.host = null;
+      this.flipper = { connected: false, walletId: null, name: null, awaiting: false, busy: false, error: null };
+      this.hostCalls.forEach((c) => c.reject(new Error("FLIPPER_HOST_CLOSED")));
+      this.hostCalls.clear();
+      this.onChange();
+    });
+    this.onChange();
+  }
+
+  private hostCall<T = any>(call: string, ...args: unknown[]): Promise<T> {
+    if (!this.host) return Promise.reject(new Error("NO_FLIPPER_HOST"));
+    const id = this.hostNext++;
+    return new Promise<T>((resolve, reject) => {
+      this.hostCalls.set(id, { resolve, reject });
+      this.host!.postMessage({ id, call, args: pack(args) });
+    });
+  }
+
+  /** Asks the host page to connect the active wallet's Flipper and open a session. */
+  connectFlipper() {
+    const w = this.active;
+    if (!w || w.kind !== "flipper") return Promise.resolve(false);
+    return this.hostCall<boolean>("connect", w.id, w.ufvk, w.deviceId ?? null);
+  }
+
+  disconnectFlipper() {
+    return this.hostCall("disconnect").catch(() => {});
+  }
+
+  /** A Flipper wallet's payment, whole: build and prove here, check and sign on the Flipper. */
+  async sendWithFlipper(payments: Payment[]) {
+    const w = this.active;
+    if (!w || w.kind !== "flipper") return;
+    let job: { id: string; request: Uint8Array } | null = null;
+    try {
+      if (!(this.flipper.connected && this.flipper.walletId === w.id) && !(await this.connectFlipper())) {
+        this.setSend({ step: "failed", message: "FLIPPER_NOT_CONNECTED" });
+        return;
+      }
+      job = await this.prepareFlipperSend(payments);
+      const sigs = unpack(await this.hostCall("sign", job.request)) as Uint8Array;
+      await this.finishFlipperSend(job.id, sigs);
+    } catch (e) {
+      if (job) this.cancelFlipperSend(job.id, e instanceof Error ? e.message : String(e));
     }
   }
 

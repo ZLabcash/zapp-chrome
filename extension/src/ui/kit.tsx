@@ -7,31 +7,32 @@ import { Icon } from "./icons";
 import { nav } from "./store";
 import { t } from "../i18n";
 
-/** A pushed screen: back arrow at the far left, title in the middle. */
-export function Screen({ title, children, back = true, onBack, trailing, scroll = true }: { title?: string; children: ComponentChildren; back?: boolean; onBack?: () => void; trailing?: ComponentChildren; scroll?: boolean }) {
+/** A pushed screen: back arrow, title, optional trailing button; a footer bar for its actions. */
+/** `onBack` returning "stay" keeps the screen (a step inside it goes back instead). */
+export function Screen({ title, children, back = true, onBack, trailing, scroll = true, footer }: { title?: string; children: ComponentChildren; back?: boolean; onBack?: () => unknown; trailing?: ComponentChildren; scroll?: boolean; footer?: ComponentChildren }) {
   return (
     <>
-      <div class="nav">
-        <div>
+      <div class="hdr" style={{ justifyContent: "space-between" }}>
+        <div style={{ width: 34 }}>
           {back && (
             <button
-              class="back-arrow"
+              class="icon-btn"
               aria-label={t("Back")}
               onClick={() => {
-                onBack?.();
-                nav.pop();
+                if (onBack?.() !== "stay") nav.pop();
               }}
             >
-              <Icon name="chevron-left" size={19} stroke={2.6} />
+              <Icon name="chevron-left" size={20} stroke={2.4} class="flip-rtl" />
             </button>
           )}
         </div>
-        <h1 class="ellipsis">{title}</h1>
-        <div class="row" style={{ justifyContent: "flex-end" }}>
+        <span class="headline ellipsis" style={{ fontSize: 15 }}>{title}</span>
+        <div class="row" style={{ width: 34, justifyContent: "flex-end" }}>
           {trailing}
         </div>
       </div>
       {scroll ? <div class="scroll">{children}</div> : <div class="stack" style={{ flex: 1, minHeight: 0 }}>{children}</div>}
+      {footer && <div class="footer">{footer}</div>}
     </>
   );
 }
@@ -42,6 +43,27 @@ export function Sheet({ children, full = false, grabber = true }: { children: Co
     <div class="sheet-backdrop" onClick={(e) => e.target === e.currentTarget && nav.closeSheet()}>
       <div class={`sheet ${full ? "full" : ""}`}>
         {grabber && <div class="grabber" />}
+        <div class="scroll">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+/** A panel that slides in from the side (the burger's menu), closed by the backdrop or closeSheet. */
+export function Drawer({ title, children }: { title?: string; children: ComponentChildren }) {
+  return (
+    <div class="drawer-backdrop" onClick={(e) => e.target === e.currentTarget && nav.closeSheet()}>
+      <div class="drawer">
+        {title && (
+          <div class="drawer-head">
+            <span class="headline">{title}</span>
+            <button class="icon-btn" aria-label={t("Close")} onClick={() => nav.closeSheet()}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+          </div>
+        )}
         <div class="scroll">{children}</div>
       </div>
     </div>
@@ -108,16 +130,23 @@ export function Toggle({ on, onChange, label }: { on: boolean; onChange: (v: boo
 }
 
 /** One choice of a list of ways: an icon and a title; greyed with a badge when it's coming. */
-export function OptionCard({ title, icon, soon = false, onClick }: { title: string; icon: ComponentChildren; soon?: boolean; onClick?: () => void }) {
+export function OptionCard({ title, subtitle, icon, soon = false, busy = false, onClick }: { title: string; subtitle?: string; icon: ComponentChildren; soon?: boolean; busy?: boolean; onClick?: () => void }) {
   return (
-    <button class={`option-card ${soon ? "soon" : ""}`} onClick={soon ? undefined : onClick} disabled={soon}>
+    <button class={`option-card ${soon ? "soon" : ""}`} onClick={soon || busy ? undefined : onClick} disabled={soon || busy}>
       <div style={{ width: 52, display: "grid", placeItems: "center" }}>{icon}</div>
-      <span class="sub b" style={{ fontSize: 16 }}>{title}</span>
-      {soon && <span class="chip-soon">{t("Coming soon")}</span>}
+      <div class="stack gap-2" style={{ minWidth: 0, textAlign: "start" }}>
+        <span class="sub b" style={{ fontSize: 16 }}>{title}</span>
+        {subtitle && <span class="foot muted" style={{ lineHeight: 1.3 }}>{subtitle}</span>}
+      </div>
       <span class="spacer" />
-      {!soon && <Icon name="chevron-right" size={14} stroke={3} class="muted" />}
+      {soon ? <span class="chip-soon" style={{ whiteSpace: "nowrap" }}>{t("Coming soon")}</span> : busy ? <Spinner size={16} /> : <Icon name="chevron-right" size={14} stroke={3} class="muted" />}
     </button>
   );
+}
+
+/** An indeterminate spinner for buttons and cards (a spinning ring). */
+export function Spinner({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return <span class="spinner" style={{ width: size, height: size, borderColor: color, borderTopColor: "transparent" }} />;
 }
 
 export function IconTile({ name, size = 44 }: { name: string; size?: number }) {

@@ -28,7 +28,9 @@ let rootsLoaded = false;
 let running: Promise<void> | null = null;
 let again = false;
 
-const BATCH = 2000;
+// Smaller batches scan in shorter synchronous bursts, so quick calls (deriving an address) slip
+// between them instead of waiting out a whole 2000-block scan (~9 s on wasm).
+const BATCH = 1000;
 
 /** Debug trace, forwarded to the pages. */
 function trace(text: string) {
@@ -241,6 +243,12 @@ const calls: Record<string, (...args: any[]) => unknown> = {
     const fp = zapp.seed_fingerprint(seed);
     const ufvk = zapp.ufvk_from_seed(seed, network, 0);
     return { fingerprint: fp, ufvk };
+  },
+  // The viewing key for a given ZIP-32 account of a seed (account 0 is the first wallet; 1, 2, …
+  // are further accounts of the same 24 words, as MetaMask derives accounts from one phrase).
+  ufvkForAccount(phrase: string, account: number) {
+    const seed = zapp.mnemonic_seed(phrase);
+    return { fingerprint: zapp.seed_fingerprint(seed), ufvk: zapp.ufvk_from_seed(seed, network, account) };
   },
   isWord: (w: string) => zapp.is_mnemonic_word(w),
   address: (ufvk: string, index: number) => zapp.address(ufvk, index),

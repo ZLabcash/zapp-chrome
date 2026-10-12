@@ -3,7 +3,7 @@
 // write makes the computer pair, and the Flipper shows a 6-digit code to type.
 //
 // A frame is 0x5A 0x01 kind len:u32le payload; strings are u16le-length UTF-8
-// (flipper-zero/core/src/protocol.rs).
+// (zfirm/core/src/protocol.rs).
 
 const SERVICE = "8fe5b3d5-2e7f-4a98-2a48-7acc60fe0000";
 /** Computer → Flipper (write). */

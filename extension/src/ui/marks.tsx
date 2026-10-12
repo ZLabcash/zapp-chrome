@@ -14,9 +14,9 @@ export function Shield({ size = 34, progress = 1 }: { size?: number; progress?: 
   const scan = Math.max(0, Math.min(1, (progress - 0.85) / 0.15));
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none" stroke-linecap="round" stroke-linejoin="round" style={{ flexShrink: 0, direction: "ltr" }}>
-      <path d="M16 2.5 27.5 7v8.6c0 7-4.8 11.9-11.5 13.9C9.3 27.5 4.5 22.6 4.5 15.6V7Z" stroke="var(--zcash)" stroke-width="2" pathLength={1} stroke-dasharray="1 1" stroke-dashoffset={1 - shield} />
-      <path d="M11 11h10L11 21h10" stroke="var(--ink)" stroke-width="2.2" pathLength={1} stroke-dasharray="1 1" stroke-dashoffset={1 - z} />
-      {scan > 0 && <path d={`M7.5 16h${17 * scan}`} stroke="var(--scan)" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.85" stroke-linecap="butt" />}
+      <path d="M16 2.6 27.6 7.1v8.5c0 7-4.8 11.9-11.6 13.9C9.2 27.5 4.4 22.6 4.4 15.6V7.1Z" stroke="var(--zcash)" stroke-width="2.4" pathLength={1} stroke-dasharray="1 1" stroke-dashoffset={1 - shield} />
+      <path d="M11 11.2h10L11 20.8h10" stroke="var(--ink)" stroke-width="3.1" pathLength={1} stroke-dasharray="1 1" stroke-dashoffset={1 - z} />
+      {scan > 0 && <path d={`M7.6 16h${16.8 * scan}`} stroke="var(--scan)" stroke-width="1.4" stroke-dasharray="2.4 2.4" opacity="0.9" stroke-linecap="butt" />}
     </svg>
   );
 }

@@ -67,6 +67,8 @@ export type Settings = {
   server: string;
   explorer: string;
   showFiat: boolean;
+  /** Minutes without use before the wallet locks itself (0: never). */
+  lockMinutes: number;
 };
 
 export type SyncInfo = {
@@ -104,6 +106,11 @@ export type State = {
   prices: Record<string, number>;
   /** A password exists for the browser wallets; Touch ID can unlock it too. */
   vault: { exists: boolean; passkey: boolean };
+  /** A password exists and hasn't been typed this session. */
+  locked: boolean;
+  flipper: import("./wallet").FlipperLinkState;
+  /** A page (side panel or app tab) holds the Bluetooth link. */
+  flipperHost: boolean;
   send: SendStep;
   online: boolean;
 };
@@ -124,6 +131,7 @@ export const DEFAULT_SETTINGS: Settings = {
   server: SERVERS[0],
   explorer: EXPLORERS[0].template,
   showFiat: false,
+  lockMinutes: 15,
 };
 
 /** Most recipients in one transaction (what the Flipper has been checked to hold). */

@@ -48,6 +48,14 @@ const P: Record<string, JSX.Element> = {
       <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
     </>
   ),
+  swap: <path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7" />,
+  image: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <circle cx="9" cy="9" r="2" />
+      <path d="m21 15-4.5-4.5L3 21" />
+    </>
+  ),
   plus: <path d="M5 12h14M12 5v14" />,
   "plus-circle": (
     <>
@@ -224,6 +232,12 @@ const P: Record<string, JSX.Element> = {
     </>
   ),
   maximize: <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />,
+  sidebar: (
+    <>
+      <rect width="18" height="18" x="3" y="3" rx="2" />
+      <path d="M15 3v18" />
+    </>
+  ),
 };
 
 export function Icon({ name, size = 20, stroke = 2, class: cls, style }: { name: string; size?: number; stroke?: number; class?: string; style?: JSX.CSSProperties }) {

@@ -37,6 +37,12 @@ chrome.alarms.onAlarm.addListener((a) => {
 
 // The popup or the app page asks for the engine before connecting to it.
 chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
+  // The toolbar icon follows the browser's theme (the offscreen document watches it).
+  if (msg?.type === "theme") {
+    const v = msg.dark ? "-dark" : "";
+    chrome.action.setIcon({ path: Object.fromEntries([16, 32, 48, 128].map((n) => [n, `icons/icon${n}${v}.png`])) });
+    return;
+  }
   if (msg?.type === "ensure-engine") {
     ensureEngine().then(() => reply(true), (e) => reply(String(e)));
     return true;
