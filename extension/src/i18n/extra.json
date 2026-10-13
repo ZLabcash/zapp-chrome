@@ -209,6 +209,20 @@
 "uk": "Адреса",
 "zh-Hans": "地址"
 },
+"All %@": {
+"ar": "الكل %@",
+"de": "Alle %@",
+"es": "Todos %@",
+"fr": "Tous les %@",
+"it": "Tutti i %@",
+"ja": "すべて %@",
+"ko": "전체 %@",
+"pt-BR": "Todos os %@",
+"ru": "Все %@",
+"th": "ทั้งหมด %@",
+"uk": "Усі %@",
+"zh-Hans": "全部 %@"
+},
 "Another account from a wallet already here — the same recovery phrase.": {
 "ar": "حساب آخر من محفظة موجودة هنا بالفعل — عبارة الاسترداد نفسها.",
 "de": "Ein weiteres Konto einer bereits vorhandenen Wallet — dieselbe Wiederherstellungsphrase.",
@@ -292,6 +306,20 @@
 "th": "เปลี่ยนรหัสผ่าน",
 "uk": "Змінити пароль",
 "zh-Hans": "更改密码"
+},
+"Checking zilkroad…": {
+"ar": "جارٍ التحقق من zilkroad…",
+"de": "zilkroad wird geprüft…",
+"es": "Consultando zilkroad…",
+"fr": "Vérification sur zilkroad…",
+"it": "Verifica su zilkroad…",
+"ja": "zilkroad を確認中…",
+"ko": "zilkroad 확인 중…",
+"pt-BR": "Verificando o zilkroad…",
+"ru": "Проверка zilkroad…",
+"th": "กำลังตรวจสอบ zilkroad…",
+"uk": "Перевірка zilkroad…",
+"zh-Hans": "正在查询 zilkroad…"
 },
 "Choose": {
 "ar": "اختيار",
@@ -418,6 +446,34 @@
 "th": "เพิ่มบัญชีไม่สำเร็จ",
 "uk": "Не вдалося додати рахунок",
 "zh-Hans": "无法添加账户"
+},
+"Couldn't load the traits.": {
+"ar": "تعذّر تحميل السمات.",
+"de": "Die Merkmale konnten nicht geladen werden.",
+"es": "No se pudieron cargar los rasgos.",
+"fr": "Impossible de charger les traits.",
+"it": "Impossibile caricare i tratti.",
+"ja": "特性を読み込めませんでした。",
+"ko": "특성을 불러올 수 없습니다.",
+"pt-BR": "Não foi possível carregar os traços.",
+"ru": "Не удалось загрузить черты.",
+"th": "โหลดคุณลักษณะไม่ได้",
+"uk": "Не вдалося завантажити риси.",
+"zh-Hans": "无法加载特征。"
+},
+"Couldn't reach zilkroad.": {
+"ar": "تعذّر الوصول إلى zilkroad.",
+"de": "zilkroad ist nicht erreichbar.",
+"es": "No se pudo conectar con zilkroad.",
+"fr": "Impossible de joindre zilkroad.",
+"it": "Impossibile raggiungere zilkroad.",
+"ja": "zilkroad に接続できません。",
+"ko": "zilkroad에 연결할 수 없습니다.",
+"pt-BR": "Não foi possível acessar o zilkroad.",
+"ru": "Не удалось связаться с zilkroad.",
+"th": "เชื่อมต่อ zilkroad ไม่ได้",
+"uk": "Не вдалося зв’язатися з zilkroad.",
+"zh-Hans": "无法连接 zilkroad。"
 },
 "Current password": {
 "ar": "كلمة المرور الحالية",
@@ -699,6 +755,20 @@
 "uk": "Фразу відновлення буде стерто з цього браузера. Без записаних 24 слів кошти буде втрачено.",
 "zh-Hans": "其助记词将从此浏览器中删除。没有你写下的 24 个词，资金将丢失。"
 },
+"Listed for": {
+"ar": "معروض بسعر",
+"de": "Angeboten für",
+"es": "En venta por",
+"fr": "En vente à",
+"it": "In vendita a",
+"ja": "出品価格",
+"ko": "판매가",
+"pt-BR": "À venda por",
+"ru": "Выставлен за",
+"th": "ลงขายที่",
+"uk": "Виставлено за",
+"zh-Hans": "挂单价"
+},
 "Lock ZApp": {
 "ar": "قفل ZApp",
 "de": "ZApp sperren",
@@ -726,6 +796,20 @@
 "th": "เมนู",
 "uk": "Меню",
 "zh-Hans": "菜单"
+},
+"Mine": {
+"ar": "لي",
+"de": "Meine",
+"es": "Míos",
+"fr": "Les miens",
+"it": "Miei",
+"ja": "自分の",
+"ko": "내 것",
+"pt-BR": "Meus",
+"ru": "Мои",
+"th": "ของฉัน",
+"uk": "Мої",
+"zh-Hans": "我的"
 },
 "NFTs": {
 "ar": "NFT",
@@ -810,6 +894,34 @@
 "th": "ยังไม่มีของสะสม",
 "uk": "Колекційних предметів ще немає.",
 "zh-Hans": "暂无收藏品。"
+},
+"No zkSNARK with that number.": {
+"ar": "لا يوجد zkSNARK بهذا الرقم.",
+"de": "Kein zkSNARK mit dieser Nummer.",
+"es": "No hay ningún zkSNARK con ese número.",
+"fr": "Aucun zkSNARK avec ce numéro.",
+"it": "Nessun zkSNARK con questo numero.",
+"ja": "その番号の zkSNARK はありません。",
+"ko": "해당 번호의 zkSNARK가 없습니다.",
+"pt-BR": "Nenhum zkSNARK com esse número.",
+"ru": "Нет zkSNARK с таким номером.",
+"th": "ไม่มี zkSNARK หมายเลขนี้",
+"uk": "Немає zkSNARK з таким номером.",
+"zh-Hans": "没有该编号的 zkSNARK。"
+},
+"No zkSNARKs in this zilkroad account yet.": {
+"ar": "لا توجد zkSNARKs في حساب zilkroad هذا بعد.",
+"de": "Noch keine zkSNARKs in diesem zilkroad-Konto.",
+"es": "Aún no hay zkSNARKs en esta cuenta de zilkroad.",
+"fr": "Aucun zkSNARKs sur ce compte zilkroad pour l’instant.",
+"it": "Ancora nessun zkSNARKs in questo account zilkroad.",
+"ja": "この zilkroad アカウントにはまだ zkSNARKs がありません。",
+"ko": "이 zilkroad 계정에는 아직 zkSNARKs가 없습니다.",
+"pt-BR": "Ainda não há zkSNARKs nesta conta do zilkroad.",
+"ru": "В этом аккаунте zilkroad пока нет zkSNARKs.",
+"th": "บัญชี zilkroad นี้ยังไม่มี zkSNARKs",
+"uk": "У цьому акаунті zilkroad поки немає zkSNARKs.",
+"zh-Hans": "此 zilkroad 账户中还没有 zkSNARKs。"
 },
 "Not enough spendable ZEC.": {
 "ar": "لا يكفي رصيد ZEC القابل للإنفاق.",
@@ -909,6 +1021,20 @@
 "uk": "Відкрити в бічній панелі",
 "zh-Hans": "在侧边栏中打开"
 },
+"Open on zilkroad": {
+"ar": "افتح على zilkroad",
+"de": "Auf zilkroad öffnen",
+"es": "Abrir en zilkroad",
+"fr": "Ouvrir sur zilkroad",
+"it": "Apri su zilkroad",
+"ja": "zilkroad で開く",
+"ko": "zilkroad에서 열기",
+"pt-BR": "Abrir no zilkroad",
+"ru": "Открыть на zilkroad",
+"th": "เปิดใน zilkroad",
+"uk": "Відкрити на zilkroad",
+"zh-Hans": "在 zilkroad 打开"
+},
 "Password": {
 "ar": "كلمة المرور",
 "de": "Passwort",
@@ -936,6 +1062,20 @@
 "th": "จ่ายได้สูงสุด 5 คนในธุรกรรมเดียว แต่ละคนมีข้อความของตัวเองหรือใช้ข้อความเดียวกัน",
 "uk": "Платіть до 5 людям однією транзакцією, кожному з власним повідомленням або одним для всіх.",
 "zh-Hans": "一笔交易最多付给 5 人，每人各附留言或共用一条。"
+},
+"Rank": {
+"ar": "الترتيب",
+"de": "Rang",
+"es": "Rango",
+"fr": "Rang",
+"it": "Rango",
+"ja": "ランク",
+"ko": "순위",
+"pt-BR": "Posição",
+"ru": "Ранг",
+"th": "อันดับ",
+"uk": "Ранг",
+"zh-Hans": "排名"
 },
 "Reject": {
 "ar": "رفض",
@@ -1007,6 +1147,20 @@
 "uk": "Шукати",
 "zh-Hans": "搜索"
 },
+"Search by number": {
+"ar": "ابحث بالرقم",
+"de": "Nach Nummer suchen",
+"es": "Buscar por número",
+"fr": "Rechercher par numéro",
+"it": "Cerca per numero",
+"ja": "番号で検索",
+"ko": "번호로 검색",
+"pt-BR": "Buscar por número",
+"ru": "Поиск по номеру",
+"th": "ค้นหาตามหมายเลข",
+"uk": "Пошук за номером",
+"zh-Hans": "按编号搜索"
+},
 "Search, or paste an address": {
 "ar": "ابحث أو الصق عنوانًا",
 "de": "Suchen oder Adresse einfügen",
@@ -1076,6 +1230,20 @@
 "th": "ลงนาม",
 "uk": "Підписати",
 "zh-Hans": "签名"
+},
+"Sign in on zilkroad": {
+"ar": "سجّل الدخول على zilkroad",
+"de": "Bei zilkroad anmelden",
+"es": "Iniciar sesión en zilkroad",
+"fr": "Se connecter sur zilkroad",
+"it": "Accedi su zilkroad",
+"ja": "zilkroad でサインイン",
+"ko": "zilkroad에서 로그인",
+"pt-BR": "Entrar no zilkroad",
+"ru": "Войти на zilkroad",
+"th": "ลงชื่อเข้าใช้ที่ zilkroad",
+"uk": "Увійти на zilkroad",
+"zh-Hans": "在 zilkroad 登录"
 },
 "Sign on Flipper": {
 "ar": "التوقيع على Flipper",
@@ -1301,6 +1469,20 @@
 "uk": "Разом",
 "zh-Hans": "合计"
 },
+"Try again": {
+"ar": "أعد المحاولة",
+"de": "Erneut versuchen",
+"es": "Reintentar",
+"fr": "Réessayer",
+"it": "Riprova",
+"ja": "再試行",
+"ko": "다시 시도",
+"pt-BR": "Tentar novamente",
+"ru": "Повторить",
+"th": "ลองอีกครั้ง",
+"uk": "Спробувати ще",
+"zh-Hans": "重试"
+},
 "Unlock": {
 "ar": "فتح القفل",
 "de": "Entsperren",
@@ -1441,6 +1623,34 @@
 "uk": "Пароль відкриває ключі цього браузера для підпису.",
 "zh-Hans": "你的密码解锁此浏览器的密钥来签名。"
 },
+"Your zkSNARKs are held in your zilkroad account. Sign in there, then come back to see them here.": {
+"ar": "تُحفظ zkSNARKs الخاصة بك في حسابك على zilkroad. سجّل الدخول هناك، ثم عُد لرؤيتها هنا.",
+"de": "Deine zkSNARKs liegen in deinem zilkroad-Konto. Melde dich dort an und komm dann zurück, um sie hier zu sehen.",
+"es": "Tus zkSNARKs están en tu cuenta de zilkroad. Inicia sesión allí y vuelve para verlos aquí.",
+"fr": "Vos zkSNARKs sont sur votre compte zilkroad. Connectez-vous là-bas, puis revenez ici pour les voir.",
+"it": "I tuoi zkSNARKs sono nel tuo account zilkroad. Accedi lì, poi torna qui per vederli.",
+"ja": "zkSNARKs は zilkroad アカウントで保管されています。そちらでサインインしてから戻ると、ここに表示されます。",
+"ko": "zkSNARKs는 zilkroad 계정에 보관됩니다. 그곳에서 로그인한 뒤 돌아오면 여기에 표시됩니다.",
+"pt-BR": "Seus zkSNARKs ficam na sua conta do zilkroad. Entre lá e volte para vê-los aqui.",
+"ru": "Ваши zkSNARKs хранятся в аккаунте zilkroad. Войдите там и вернитесь, чтобы увидеть их здесь.",
+"th": "zkSNARKs ของคุณอยู่ในบัญชี zilkroad ลงชื่อเข้าใช้ที่นั่น แล้วกลับมาดูได้ที่นี่",
+"uk": "Ваші zkSNARKs зберігаються в акаунті zilkroad. Увійдіть там і поверніться, щоб побачити їх тут.",
+"zh-Hans": "你的 zkSNARKs 保存在你的 zilkroad 账户中。请先在那里登录，再回到这里查看。"
+},
+"Yours": {
+"ar": "لك",
+"de": "Deins",
+"es": "Tuyo",
+"fr": "À vous",
+"it": "Tuo",
+"ja": "あなたの",
+"ko": "내 것",
+"pt-BR": "Seu",
+"ru": "Ваш",
+"th": "ของคุณ",
+"uk": "Ваш",
+"zh-Hans": "你的"
+},
 "ZApp in Chrome: create a wallet, restore one from its words, or connect your Flipper Zero over Bluetooth.": {
 "ar": "ZApp في Chrome: أنشئ محفظة، أو استعدها بكلماتها، أو وصّل Flipper Zero عبر Bluetooth.",
 "de": "ZApp in Chrome: Erstelle eine Wallet, stelle eine aus ihren Wörtern wieder her oder verbinde deinen Flipper Zero per Bluetooth.",
@@ -1468,5 +1678,19 @@
 "th": "ZApp ถูกล็อกอยู่ ปลดล็อกแล้วส่งอีกครั้ง",
 "uk": "ZApp заблоковано. Розблокуйте його й надішліть знову.",
 "zh-Hans": "ZApp 已锁定。请解锁后重新发送。"
+},
+"zilkroad address": {
+"ar": "عنوان zilkroad",
+"de": "zilkroad-Adresse",
+"es": "Dirección de zilkroad",
+"fr": "Adresse zilkroad",
+"it": "Indirizzo zilkroad",
+"ja": "zilkroad のアドレス",
+"ko": "zilkroad 주소",
+"pt-BR": "Endereço do zilkroad",
+"ru": "Адрес zilkroad",
+"th": "ที่อยู่ zilkroad",
+"uk": "Адреса zilkroad",
+"zh-Hans": "zilkroad 地址"
 }
 }

@@ -35,6 +35,7 @@
     "https://zec.rocks/*",
     "https://*.zec.rocks/*",
     "https://api.zscan.cash/*",
+    "https://zilkroad.com/*",
     "https://download.z.cash/*",
     "https://api.coingecko.com/*"
   ],

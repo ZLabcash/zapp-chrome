@@ -1,5 +1,5 @@
 // Home, as Chrome wallet extensions lay it out: the wallet picker and menu on top, the address
-// to copy, the balance, round actions, then Activity and To broadcast as tabs.
+// to copy, the balance, round actions, then Activity, NFTs (zkSNARKs) and To broadcast as tabs.
 
 import { useEffect, useState } from "preact/hooks";
 import { t, formatFiat, formatNumber } from "../i18n";
@@ -16,6 +16,7 @@ import { SettingsScreen } from "./settings";
 import { ContactsScreen } from "./contacts";
 import { WalletPicker } from "./wallets";
 import { FlipperCard, FlipperConnected } from "./flipper";
+import { NftsTab } from "./nfts";
 
 export function activeWallet(s: State): Wallet | undefined {
   return s.wallets.find((w) => w.id === s.activeId);
@@ -116,19 +117,9 @@ export function HomeScreen() {
           )}
         </div>
         <div key={tab} class="rise-in">
-          {tab === "activity" ? <ActivityList /> : tab === "nft" ? <NftsEmpty /> : <PendingList />}
+          {tab === "activity" ? <ActivityList /> : tab === "nft" ? <NftsTab /> : <PendingList />}
         </div>
       </div>
-    </div>
-  );
-}
-
-/** NFTs: Zcash has none yet in ZApp — an empty state, as MetaMask shows for a chain without any. */
-function NftsEmpty() {
-  return (
-    <div class="stack center gap-8" style={{ padding: "48px 24px", textAlign: "center" }}>
-      <Icon name="image" size={30} stroke={1.8} class="muted" />
-      <div class="foot muted" style={{ lineHeight: 1.4 }}>{t("No collectibles yet.")}</div>
     </div>
   );
 }
